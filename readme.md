@@ -1,87 +1,173 @@
-# 주제
-고등학생 성적 등급(GradeClass) 예측 및 성과 개선 인사이트 도출:
-- 목표: GradeClass(0:A … 4:F)를 높은 정확도로 예측하고, 성적 개선에 가장 영향을 주는 요인과 개입 시나리오를 제시한다.
+# Higher Education Student Retention Prediction
 
-# 배경 및 데이터
-- 출처: Kaggle “Students Performance Dataset”
-- 표본: 2,392명
-- 주요 변수: Age(15–18), Gender(0/1), Ethnicity(0–3), ParentalEducation(0–4), StudyTimeWeekly(0–20h), Absences(0–30), Tutoring(0/1), ParentalSupport(0–4), Extracurricular/Sports/Music/Volunteering(0/1), GPA(2.0–4.0), GradeClass(0–4)
+Predicting Dropout Risk & Academic Success Using Machine Learning
 
-# 연구 질문
-1) 성적 등급 예측: 어떤 학생이 F(4) 또는 D(3)로 갈 확률이 높은가?
-2) 개선 포인트: 주당 학습시간 증가, 결석 감소, 튜터링/부모지원 등 각 개입이 예측 확률에 어떤 변화를 주는가?
-3) 공정성: 성별/민족 등 민감 특성이 예측 및 추천에 불합리한 영향을 주는가?
+⸻
 
-# 성공 지표(평가)
-- 분류 성능: Macro F1, Balanced Accuracy, ROC-AUC(One-vs-Rest)
-- 운영 지표: Recall@Risk(하위 등급(D/F) 탐지 재현율), Precision@Risk
-- 해석 가능성: 글로벌/로컬 특성 기여(SHAP), 반사실 시나리오의 설득력
-- 공정성: 그룹별 성능 차이(ΔF1, ΔTPR), Demographic Parity 간단 점검
+1. 프로젝트 개요 (Project Overview)
 
-# 방법론
-1) EDA
-- 분포/상관: GPA와 StudyTimeWeekly, Absences의 관계, ParentalSupport의 단계 효과
-- 클래스 불균형 확인 및 리샘플링/가중치 전략 검토
+학생의 중도 탈락(dropout) 은 대학 교육 품질·재정 안정성·학생 복지와 직결되는 핵심 문제다.
+본 프로젝트는 Kaggle의 Predict students' dropout and academic success 데이터를 활용하여:
+	•	어떤 학생이 졸업(Graduate) 할지
+	•	어떤 학생이 재학 유지(Enrolled) 할지
+	•	어떤 학생이 중도탈락(Dropout) 할지
 
-2) 전처리
-- 결측/이상치 처리
-- 범주형 인코딩: One-Hot(민족, 부모교육 등)
-- 스케일링: 수치형(학습시간, 결석)
-- 데이터 분할: Train/Valid/Test = 70/15/15, 계층화(Stratified)
+이를 머신러닝으로 예측하는 모델을 개발하는 것이다.
+더불어 주요 요인(feature)이 학생의 학업 지속성에 어떤 영향을 미치는지 분석하여
+교육정책 및 학생 지원 프로그램 설계에 시사점을 제공하는 것이 목적이다.
 
-3) 베이스라인
-- 로지스틱 회귀(클래스 가중치 포함)
-- 트리 기반: Random Forest, XGBoost/LightGBM
+⸻
 
-4) 고도화
-- 비용민감 학습: D/F 오분류 패널티 상향(클래스 가중치)
-- 교차검증: Stratified K-Fold(5)
-- 하이퍼파라미터 탐색: Optuna
-- 캘리브레이션: Platt/Isotonic으로 확률 보정
+2. 문제 정의 (Problem Statement)
 
-5) 해석·인사이트
-- 글로벌 중요도: SHAP feature importance
-- 로컬 설명: 위험 학생별 SHAP waterfall
-- 반사실(What-if): 학습시간 +2h, 결석 −3회, 튜터링=1, 부모지원 +1단계 적용 시 예측 변화
-- 정책 시뮬레이션: 예산 제약 하에서 최대 성과 향상 조합(간단한 그리디/휴리스틱)
+교육기관이 직면한 주요 질문은 다음과 같다:
+	•	“어떤 학생이 중도탈락할까?”
+	•	“어떤 요인이 학업 지속 여부에 가장 큰 영향을 줄까?”
+	•	“위험 학생을 조기에 식별할 수 있을까?”
 
-6) 공정성 점검
-- 성별/민족 그룹별 성능 비교
-- 필요한 경우 민감 변수 제외/제약 학습으로 영향 완화
+이를 해결하기 위해 본 프로젝트는 다음을 수행한다:
+	1.	학생의 상태(Target) 예측
+	•	Dropout / Graduate / Enrolled
+	•	→ 다중 분류(Multi-class Classification) 문제
+	2.	모델링을 통해 위험 예측 정확도 개선
+	3.	Feature Importance & SHAP 분석을 통한 주요 영향 요인 도출
 
-# 산출물(Deliverables)
-- 보고서: EDA → 모델링 → 성능 → 해석 → 반사실 시나리오 → 공정성
-- 대시보드: 위험 학생 탐지, 추천 개입 포인트, What-if 슬라이더(학습시간/결석/튜터링/부모지원)
-- 코드: 재현 가능한 파이프라인(전처리/학습/해석)
-- 모형 카드(Model Card): 데이터/가정/한계/공정성/배포시 고려사항
+⸻
 
-# 일정(2주)
-- 1주차
-  - D1–D2: EDA/전처리 파이프라인
-  - D3–D4: 베이스라인/교차검증
-  - D5: 캘리브레이션/초기 SHAP/초기 보고서
-- 2주차
-  - D6–D7: 하이퍼튜닝/비용민감 최적화
-  - D8: 반사실/정책 시뮬레이션/공정성 점검
-  - D9–D10: 대시보드/최종 보고서/모형 카드
+3. 데이터셋 정보 (Dataset Description)
+	•	데이터셋: Higher Education Predictors of Student Retention
+	•	출처: Kaggle
+	•	행 개수: 약 4,424명
+	•	컬럼 수: 37개
+	•	데이터 유형:
+	•	인구통계 정보
+	•	사회경제적 지표
+	•	학업 성취
+	•	등록 상태 및 재정 정보
 
-# 기술 스택
-- Python: Pandas, scikit-learn, LightGBM/XGBoost
-- 해석: SHAP
-- 실험 관리: Optuna
-- 시각화/대시보드: Plotly/Streamlit
+⸻
 
-# 위험·한계
-- 합성 데이터: 실제 학교 적용 전, 외부 검증 필요
-- 민감 변수: 성별/민족 사용의 윤리·법적 고려
-- 인과 추론 한계: 반사실은 시뮬레이션일 뿐, 실제 개입 효과 검증 필요
+4. Target 변수 정의
 
-# 기대 효과
-- 운영 측면: D/F 위험 학생 조기 탐지로 개입 효율 극대화
-- 정책 측면: 가장 영향력 있는 요인(예: 결석 감소, 부모지원 강화)을 근거 기반으로 추천
+데이터의 주요 타깃(Target)은 단일 변수를 통해 정의되며,
+학생 상태를 3개의 카테고리로 분류한다:
+
+값	의미
+Graduate	졸업
+Enrolled	재학 중
+Dropout	중도 탈락
+
+→ 따라서 Softmax 기반 다중 분류(Multi-class Classification) 문제로 접근한다.
+
+⸻
+
+5. 주요 변수 목록 (Feature List Summary)
+
+변수들은 크게 5가지 그룹으로 구성된다:
+
+✔ 학생 정보 (Student Information)
+	•	Gender
+	•	Age at enrollment
+	•	Marital_status
+	•	Nationality
+
+✔ 사회·경제적 변수(Socioeconomic)
+	•	Father_qualification
+	•	Mother_qualification
+	•	Father_occupation
+	•	Mother_occupation
+	•	Debtor (등록금 미납 여부)
+	•	Scholarship_holder
+	•	Tuition_fees_up_to_date
+
+✔ 학업 관련 변수(Academic Performance)
+	•	Curricular_units_1st_sem_approved
+	•	Curricular_units_1st_sem_grade
+	•	Curricular_units_2nd_sem_approved
+	•	Curricular_units_2nd_sem_grade
+	•	Admission_grade
+
+✔ 생활/상황 변수(Attendance, Lifestyle)
+	•	Daytime/evening attendance
+	•	Displaced
+	•	Educational_special_needs
+	•	International
+
+✔ 경제/사회 환경 변수 (Regional Socioeconomic Indicators)
+	•	Unemployment_rate
+	•	Inflation_rate
+	•	GDP
+
+⸻
+
+6. 데이터 전처리 계획 (Data Preprocessing Plan)
+	1.	결측치 확인 → 기본적으로 없음
+	2.	이상치 탐지 및 제거 (IQR 사용)
+	3.	범주형 변수 인코딩 (LabelEncoder / One-Hot Encoding)
+	4.	Feature Selection (Chi-square 또는 ANOVA)
+	5.	클래스 불균형 해결 (SMOTE Oversampling)
+	6.	데이터 표준화/정규화(필요 시)
+
+⸻
+
+7. 모델링 계획 (Modeling Plan)
+
+✔ 적용할 모델
+
+Baseline:
+	•	Logistic Regression
+	•	Decision Tree
+
+Ensemble Models:
+	•	Random Forest
+	•	Gradient Boosting
+	•	XGBoost
+	•	LightGBM
+	•	CatBoost (범주형 변수 강점 → 예상 Best Model)
+
+✔ 평가 지표
+	•	Accuracy
+	•	Precision, Recall, F1-score
+	•	Confusion Matrix
+	•	ROC-AUC (One-vs-Rest 방식)
+
+⸻
+
+8. 결과 분석 (Interpretation)
+	•	Feature Importance
+	•	SHAP Value로 개인/전체 수준에서의 요인 영향력 분석
+	•	Dropout 고위험군 특성 정의
+
+⸻
+
+9. 기대 효과 (Impact & Insights)
+	•	위험 학생 조기 식별 → 개입 정책 수립 가능
+	•	장학금·학습 지원 정책의 효과 분석 가능
+	•	떨어질 가능성 높은 요소 파악 → 실질적 교육 데이터 기반 의사결정 지원
+	•	머신러닝 모델을 통한 교육행정 효율화
+
+⸻
+
+10. 프로젝트 구성 (Repository Structure)
+
+├── README.md  
+├── data/  
+│   ├── raw/  
+│   ├── processed/  
+├── notebooks/  
+│   ├── 01_EDA.ipynb  
+│   ├── 02_Preprocessing.ipynb  
+│   ├── 03_Modeling.ipynb  
+│   ├── 04_Evaluation.ipynb  
+├── models/  
+│   ├── best_model.pkl  
+├── reports/  
+│   ├── EDA_report.md  
+│   ├── modeling_summary.md  
+├── src/  
+│   ├── preprocess.py  
+│   ├── train.py  
+│   ├── evaluate.py  
 
 
-
-
-
-https://www.kaggle.com/datasets/rabieelkharoua/students-performance-dataset
+⸻
