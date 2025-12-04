@@ -2,18 +2,25 @@
 
 Predicting Dropout Risk & Academic Success Using Machine Learning
 
+학생 중도 탈락 여부 예측
+
 ⸻
 
 1. 프로젝트 개요 (Project Overview)
 
 학생의 중도 탈락(dropout) 은 대학 교육 품질·재정 안정성·학생 복지와 직결되는 핵심 문제다.
-본 프로젝트는 Kaggle의 Predict students' dropout and academic success 데이터를 활용하여:
+본 프로젝트는 Kaggle의 Predict students' dropout and academic success 데이터를 활용하여
+
 	•	어떤 학생이 졸업(Graduate) 할지
+
 	•	어떤 학생이 재학 유지(Enrolled) 할지
+
 	•	어떤 학생이 중도탈락(Dropout) 할지
 
 이를 머신러닝으로 예측하는 모델을 개발하는 것이다.
+
 더불어 주요 요인(feature)이 학생의 학업 지속성에 어떤 영향을 미치는지 분석하여
+
 교육정책 및 학생 지원 프로그램 설계에 시사점을 제공하는 것이 목적이다.
 
 ⸻
@@ -21,29 +28,36 @@ Predicting Dropout Risk & Academic Success Using Machine Learning
 2. 문제 정의 (Problem Statement)
 
 교육기관이 직면한 주요 질문은 다음과 같다:
+
 	•	“어떤 학생이 중도탈락할까?”
+
 	•	“어떤 요인이 학업 지속 여부에 가장 큰 영향을 줄까?”
+
 	•	“위험 학생을 조기에 식별할 수 있을까?”
 
 이를 해결하기 위해 본 프로젝트는 다음을 수행한다:
+
 	1.	학생의 상태(Target) 예측
+
 	•	Dropout / Graduate / Enrolled
+
 	•	→ 다중 분류(Multi-class Classification) 문제
+
 	2.	모델링을 통해 위험 예측 정확도 개선
+
 	3.	Feature Importance & SHAP 분석을 통한 주요 영향 요인 도출
 
 ⸻
 
 3. 데이터셋 정보 (Dataset Description)
+
 	•	데이터셋: Higher Education Predictors of Student Retention
+
 	•	출처: Kaggle
+
 	•	행 개수: 약 4,424명
-	•	컬럼 수: 37개
-	•	데이터 유형:
-	•	인구통계 정보
-	•	사회경제적 지표
-	•	학업 성취
-	•	등록 상태 및 재정 정보
+
+	•	컬럼 수: 35개
 
 ⸻
 
@@ -65,13 +79,13 @@ Dropout	중도 탈락
 
 변수들은 크게 5가지 그룹으로 구성된다:
 
-✔ 학생 정보 (Student Information)
+✔ 학생 개인 정보 (Student Information)
 	•	Gender
 	•	Age at enrollment
 	•	Marital_status
 	•	Nationality
 
-✔ 사회·경제적 변수(Socioeconomic)
+✔ 가정 경제적 변수(Socioeconomic)
 	•	Father_qualification
 	•	Mother_qualification
 	•	Father_occupation
